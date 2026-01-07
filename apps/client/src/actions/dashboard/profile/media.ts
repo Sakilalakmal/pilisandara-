@@ -1,7 +1,7 @@
 "use server";
 
 import { requireUser } from "@/data/user/require-user";
-import { fetchMutation } from "convex/nextjs";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
 
 export async function generateAvatarUploadUrlAction() {
@@ -29,3 +29,9 @@ export async function setCoverAction(fileId: string) {
     fileId: fileId as any,
   });
 }
+
+export async function getMyMediaUrlsAction() {
+  const user = await requireUser();
+  return fetchQuery(api.profiles_media.getMediaUrls, { userId: user.id });
+}
+
