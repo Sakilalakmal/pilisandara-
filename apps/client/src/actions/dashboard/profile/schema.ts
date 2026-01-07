@@ -9,6 +9,9 @@ export const intentEnum = z.enum([
   "teach",
 ]);
 
+export type Intent = z.infer<typeof intentEnum>;
+
+
 export const visibilityEnum = z.enum(["public", "server_only", "private"]);
 
 const tagArray = z
