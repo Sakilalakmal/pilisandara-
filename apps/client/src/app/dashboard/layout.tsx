@@ -9,7 +9,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireUser();
+ const user =  await requireUser();
 
   return (
     <SidebarProvider
