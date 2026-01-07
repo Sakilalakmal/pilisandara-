@@ -1,0 +1,108 @@
+# ===============================
+# OS & Editor
+# ===============================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===============================
+# Node / Package Managers
+# ===============================
+node_modules/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===============================
+# Next.js
+# ===============================
+.next/
+out/
+build/
+.vercel/
+.turbo/
+
+# ===============================
+# Environment Variables (CRITICAL)
+# ===============================
+.env
+.env.*
+!.env.example
+
+# ===============================
+# Convex
+# ===============================
+.convex/
+.convex.local*
+.convex.dev*
+.convex.prod*
+
+# ===============================
+# Prisma / Database
+# ===============================
+prisma/dev.db
+prisma/dev.db-journal
+*.sqlite
+*.sqlite3
+
+# ===============================
+# Logs
+# ===============================
+logs/
+*.log
+
+# ===============================
+# Testing
+# ===============================
+coverage/
+.nyc_output/
+
+# ===============================
+# Docker / Infra
+# ===============================
+docker-data/
+docker-volume/
+*.pid
+
+# ===============================
+# Temporary / Cache
+# ===============================
+.cache/
+.tmp/
+.temp/
+
+# ===============================
+# Uploads / Media (if local)
+# ===============================
+uploads/
+public/uploads/
+
+# ===============================
+# Workers / Build Artifacts
+# ===============================
+dist/
+lib/
+.esbuild/
+
+# ===============================
+# Secrets & Keys
+# ===============================
+*.pem
+*.key
+*.crt
+*.p12
+
+# ===============================
+# Optional: Ignore Storybook / Docs Builds
+# ===============================
+storybook-static/
+
+# ===============================
+# Ignore local scripts
+# ===============================
+scripts/local/
