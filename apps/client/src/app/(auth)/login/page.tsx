@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { JSX, useState, useTransition } from "react";
+import { JSX, useState } from "react";
 import { Loader2Icon } from "lucide-react";
+
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,15 +18,18 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SignInForm, SignUpForm } from "@/types/auth-types";
+import { toast } from "sonner";
 
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
   if (typeof err === "string") return err;
   return "Something went wrong.";
 }
+
+type LoadingKind = "google" | "github" | "signin" | "signup" | null;
+
 export default function AuthPage(): JSX.Element {
-  const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<LoadingKind>(null);
 
   const [signIn, setSignIn] = useState<SignInForm>({
     email: "",
@@ -37,6 +41,8 @@ export default function AuthPage(): JSX.Element {
     email: "",
     password: "",
   });
+
+  const disabled = loading !== null;
 
   function updateSignIn<K extends keyof SignInForm>(
     key: K,
@@ -52,44 +58,58 @@ export default function AuthPage(): JSX.Element {
     setSignUp((prev: SignUpForm) => ({ ...prev, [key]: value }));
   }
 
-  function run(task: () => Promise<void>): void {
-    setMessage(null);
-    startTransition(() => {
-      task().catch((e: unknown) => {
-        setMessage(getErrorMessage(e));
-      });
-    });
+  async function run(
+    kind: Exclude<LoadingKind, null>,
+    task: () => Promise<void>
+  ): Promise<void> {
+    setLoading(kind);
+
+    try {
+      await task();
+    } catch (e: unknown) {
+      toast.error(getErrorMessage(e));
+      setLoading(null);
+    }
   }
 
-  const disabled: boolean = isPending;
-
-  const handleGoogle = (): void =>
-    run(async (): Promise<void> => {
+  const handleGoogle = (): void => {
+    void run("google", async (): Promise<void> => {
       await authClient.signIn.social({ provider: "google" });
-    });
 
-  const handleGithub = (): void =>
-    run(async (): Promise<void> => {
+      // If your provider redirects, you won't see this (fine).
+      // If it doesn't redirect (popup flow), stop loading:
+      setLoading(null);
+    });
+  };
+
+  const handleGithub = (): void => {
+    void run("github", async (): Promise<void> => {
       await authClient.signIn.social({ provider: "github" });
+      setLoading(null);
     });
+  };
 
-  const handleSignIn = (): void =>
-    run(async (): Promise<void> => {
+  const handleSignIn = (): void => {
+    void run("signin", async (): Promise<void> => {
       const res = await authClient.signIn.email({
         email: signIn.email,
         password: signIn.password,
       });
 
       if (res?.error) {
-        setMessage(res.error.message ?? "Sign in failed");
+        toast.error(res.error.message ?? "Please check your credentials.");
+        setLoading(null);
         return;
       }
 
-      setMessage("Signed in ✅");
-    });
+      toast.success("Signed in ✅ Welcome back!");
 
-  const handleSignUp = (): void =>
-    run(async (): Promise<void> => {
+      setLoading(null);
+    });
+  };
+
+  const handleSignUp = (): void => {
+    void run("signup", async (): Promise<void> => {
       const res = await authClient.signUp.email({
         name: signUp.name,
         email: signUp.email,
@@ -97,13 +117,19 @@ export default function AuthPage(): JSX.Element {
       });
 
       if (res?.error) {
-        setMessage(res.error.message ?? "Sign up failed");
+        toast.error(res.error.message ?? "Please try again.");
+        setLoading(null);
         return;
       }
 
-      setMessage("Account created ✅ Check your email for the OTP.");
-      // Next step: redirect to /verify-email?email=...
+      toast.success("Account created ✅ Check your email for the OTP.");
+
+      setLoading(null);
     });
+  };
+
+  const isLoading = (kind: Exclude<LoadingKind, null>): boolean =>
+    loading === kind;
 
   return (
     <Card className="rounded-3xl">
@@ -122,7 +148,9 @@ export default function AuthPage(): JSX.Element {
             onClick={handleGoogle}
             disabled={disabled}
           >
-            {isPending ? <Loader2Icon className="size-4 animate-spin" /> : null}
+            {isLoading("google") ? (
+              <Loader2Icon className="size-4 animate-spin" />
+            ) : null}
             Continue with Google
           </Button>
 
@@ -132,7 +160,9 @@ export default function AuthPage(): JSX.Element {
             onClick={handleGithub}
             disabled={disabled}
           >
-            {isPending ? <Loader2Icon className="size-4 animate-spin" /> : null}
+            {isLoading("github") ? (
+              <Loader2Icon className="size-4 animate-spin" />
+            ) : null}
             Continue with GitHub
           </Button>
         </div>
@@ -142,10 +172,6 @@ export default function AuthPage(): JSX.Element {
           <span className="text-xs text-muted-foreground">or</span>
           <Separator className="flex-1" />
         </div>
-
-        {message ? (
-          <p className="text-sm text-muted-foreground">{message}</p>
-        ) : null}
 
         {/* Email auth */}
         <Tabs defaultValue="signin" className="w-full">
@@ -200,7 +226,7 @@ export default function AuthPage(): JSX.Element {
               onClick={handleSignIn}
               disabled={disabled}
             >
-              {isPending ? (
+              {isLoading("signin") ? (
                 <Loader2Icon className="size-4 animate-spin" />
               ) : null}
               Sign in
@@ -256,7 +282,7 @@ export default function AuthPage(): JSX.Element {
               onClick={handleSignUp}
               disabled={disabled}
             >
-              {isPending ? (
+              {isLoading("signup") ? (
                 <Loader2Icon className="size-4 animate-spin" />
               ) : null}
               Create account
