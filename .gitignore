@@ -106,3 +106,8 @@ storybook-static/
 # Ignore local scripts
 # ===============================
 scripts/local/
+
+
+# convex
+/.convex
+/convex/_generated
