@@ -8,9 +8,11 @@
  * @module
  */
 
+import type * as maintenance from "../maintenance.js";
 import type * as profiles from "../profiles.js";
 import type * as profiles_media from "../profiles_media.js";
 import type * as upload from "../upload.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -19,9 +21,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  maintenance: typeof maintenance;
   profiles: typeof profiles;
   profiles_media: typeof profiles_media;
   upload: typeof upload;
+  users: typeof users;
 }>;
 
 /**

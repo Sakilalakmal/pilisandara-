@@ -3,6 +3,7 @@
 import { requireUser } from "@/data/user/require-user";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 
 export async function generateAvatarUploadUrlAction() {
   await requireUser();
@@ -18,7 +19,7 @@ export async function setAvatarAction(fileId: string) {
   const user = await requireUser();
   return fetchMutation(api.profiles_media.setAvatar, {
     userId: user.id,
-    fileId: fileId as any, // we'll strongly type later with generated types
+    fileId: fileId as Id<"_storage">,
   });
 }
 
@@ -26,7 +27,7 @@ export async function setCoverAction(fileId: string) {
   const user = await requireUser();
   return fetchMutation(api.profiles_media.setCover, {
     userId: user.id,
-    fileId: fileId as any,
+    fileId: fileId as Id<"_storage">,
   });
 }
 
@@ -35,3 +36,12 @@ export async function getMyMediaUrlsAction() {
   return fetchQuery(api.profiles_media.getMediaUrls, { userId: user.id });
 }
 
+export async function clearAvatarAction() {
+  const user = await requireUser();
+  return fetchMutation(api.profiles_media.clearAvatar, { userId: user.id });
+}
+
+export async function clearCoverAction() {
+  const user = await requireUser();
+  return fetchMutation(api.profiles_media.clearCover, { userId: user.id });
+}
