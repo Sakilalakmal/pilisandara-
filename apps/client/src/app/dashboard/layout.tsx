@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { DashboardContent } from "./_components/dashboard-content";
 
 import { requireUser } from "@/data/user/require-user";
 
@@ -9,7 +10,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
- const user =  await requireUser();
+  const user = await requireUser();
 
   return (
     <SidebarProvider
@@ -25,7 +26,7 @@ export default async function DashboardLayout({
         <SiteHeader />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
-            {children}
+            <DashboardContent>{children}</DashboardContent>
           </div>
         </div>
       </SidebarInset>

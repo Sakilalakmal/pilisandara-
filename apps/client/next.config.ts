@@ -3,6 +3,16 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Turbopack configuration (Next.js 16+ default)
   turbopack: {},
+  images:{
+    remotePatterns:[
+      {
+        protocol: 'https',
+        hostname: 'cool-sparrow-448.convex.cloud',
+        port: '',
+        pathname: '/**',
+      }
+    ]
+  },
   
   // Webpack configuration for fallback/production builds
   webpack: (config, { isServer }) => {
