@@ -1,14 +1,18 @@
 "use client";
 
-import { ProfileCompletionCard } from "@/components/onboarding";
+import { ProfileCompletionCard } from "@/components/profile";
 
-export function DashboardContent({ children }: { children: React.ReactNode }) {
+export function DashboardContent({
+  userId,
+  children,
+}: {
+  userId: string;
+  children: React.ReactNode;
+}) {
   return (
     <>
       {/* Onboarding gate - shows completion card if profile is incomplete */}
-      <div className="px-4 pt-4 lg:px-6">
-        <ProfileCompletionCard />
-      </div>
+      <ProfileCompletionCard userId={userId} />
 
       {/* Main content */}
       {children}

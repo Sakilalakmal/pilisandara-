@@ -11,6 +11,11 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
+  const dashboardUser = {
+    name: user.name ?? null,
+    email: user.email,
+    image: user.image ?? null,
+  };
 
   return (
     <SidebarProvider
@@ -21,12 +26,12 @@ export default async function DashboardLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar variant="inset" user={dashboardUser} />
       <SidebarInset>
-        <SiteHeader />
+        <SiteHeader user={dashboardUser} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
-            <DashboardContent>{children}</DashboardContent>
+            <DashboardContent userId={user.id}>{children}</DashboardContent>
           </div>
         </div>
       </SidebarInset>

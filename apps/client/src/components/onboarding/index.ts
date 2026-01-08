@@ -1,2 +1,2 @@
-export { ProfileCompletionCard } from "./profile-completion-card";
+export { ProfileCompletionCard } from "../profile/profile-completion-card";
 export { OnboardingStepperModal } from "./onboarding-stepper-modal";

@@ -2,18 +2,17 @@
 
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { authClient } from "@/lib/auth-client";
 import { useMemo } from "react";
 
 export type ProfileStatus = {
-  isLoading: boolean;
+  loading: boolean;
   isComplete: boolean;
   percent: number;
   missing: string[];
 };
 
 const DEFAULT_STATUS: ProfileStatus = {
-  isLoading: false,
+  loading: false,
   isComplete: false,
   percent: 0,
   missing: ["displayName", "username", "avatar"],
@@ -24,36 +23,24 @@ const DEFAULT_STATUS: ProfileStatus = {
  * Reusable across the app for checking profile completeness
  * Uses Convex reactive queries for automatic updates
  */
-export function useProfileStatus(): ProfileStatus {
-  const { data: session, isPending: sessionLoading } = authClient.useSession();
-  const userId = session?.user?.id;
-
+export function useProfileStatus(userId?: string): ProfileStatus {
   const status = useQuery(
     api.users.getMyProfileStatus,
     userId ? { userId } : "skip"
   );
 
   return useMemo(() => {
-    // Loading state
-    if (sessionLoading || status === undefined) {
-      return {
-        isLoading: true,
-        isComplete: false,
-        percent: 0,
-        missing: [],
-      };
-    }
+    if (!userId) return DEFAULT_STATUS;
 
-    // No session or no status
-    if (!userId || !status) {
-      return DEFAULT_STATUS;
+    if (status === undefined) {
+      return { ...DEFAULT_STATUS, loading: true, missing: [] };
     }
 
     return {
-      isLoading: false,
+      loading: false,
       isComplete: status.isComplete,
       percent: status.percent,
       missing: status.missing,
     };
-  }, [sessionLoading, status, userId]);
+  }, [status, userId]);
 }
