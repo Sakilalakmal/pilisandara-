@@ -21,7 +21,6 @@ import {
   IconChevronLeft,
   IconLoader2,
 } from "@tabler/icons-react";
-import { authClient } from "@/lib/auth-client";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { toast } from "sonner";
@@ -40,6 +39,7 @@ const INTENT_OPTIONS = [
 type IntentValue = (typeof INTENT_OPTIONS)[number]["value"];
 
 interface OnboardingStepperModalProps {
+  userId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -51,12 +51,10 @@ const STEPS = [
 ] as const;
 
 export function OnboardingStepperModal({
+  userId,
   open,
   onOpenChange,
 }: OnboardingStepperModalProps) {
-  const { data: session } = authClient.useSession();
-  const userId = session?.user?.id;
-
   // Steps state
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);

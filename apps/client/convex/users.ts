@@ -1,10 +1,6 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 
-/**
- * Profile completeness status query
- * Returns isComplete, percent, and missing fields
- */
 export const getMyProfileStatus = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
@@ -21,43 +17,31 @@ export const getMyProfileStatus = query({
       };
     }
 
+    const hasText = (value: string | undefined) =>
+      typeof value === "string" && value.trim().length > 0;
+    const hasArray = (value: unknown[] | undefined) =>
+      Array.isArray(value) && value.length > 0;
+
+    const hasDisplayName = hasText(profile.displayName);
+    const hasUsername = hasText(profile.username);
+    const hasAvatar = !!profile.avatarFileId;
+    const hasAbout =
+      hasText(profile.bio) ||
+      hasArray(profile.interests) ||
+      hasArray(profile.intent);
+
     const missing: string[] = [];
-    let percent = 0;
+    if (!hasDisplayName) missing.push("displayName");
+    if (!hasUsername) missing.push("username");
+    if (!hasAvatar) missing.push("avatar");
 
-    // Required fields (25% each)
-    if (profile.displayName && profile.displayName.trim() !== "") {
-      percent += 25;
-    } else {
-      missing.push("displayName");
-    }
+    const percent =
+      (hasDisplayName ? 25 : 0) +
+      (hasUsername ? 25 : 0) +
+      (hasAvatar ? 25 : 0) +
+      (hasAbout ? 25 : 0);
 
-    if (profile.username && profile.username.trim() !== "") {
-      percent += 25;
-    } else {
-      missing.push("username");
-    }
-
-    if (profile.avatarFileId) {
-      percent += 25;
-    } else {
-      missing.push("avatar");
-    }
-
-    // Optional bonus (25% if any of bio, interests, or intent exists)
-    const hasBio = profile.bio && profile.bio.trim() !== "";
-    const hasInterests = profile.interests && profile.interests.length > 0;
-    const hasIntent = profile.intent && profile.intent.length > 0;
-
-    if (hasBio || hasInterests || hasIntent) {
-      percent += 25;
-    }
-
-    // Profile is complete only if all required fields exist
-    const isComplete =
-      missing.length === 0 &&
-      !!profile.displayName &&
-      !!profile.username &&
-      !!profile.avatarFileId;
+    const isComplete = hasDisplayName && hasUsername && hasAvatar;
 
     return {
       isComplete,
